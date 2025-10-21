@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { fetchCurrentUser, isAuthenticated, login as directusLogin, logout as directusLogout } from '../lib/directus';
-import { ADMIN_ROLE_ID } from '../lib/env';
+import { ADMIN_ROLE_ID, ADMIN_ROLE_IDS } from '../lib/env';
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -109,17 +109,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const role = me?.role;
       const hasAdminFlag = isRoleObject(role) ? Boolean(role.admin_access) : false;
       const matchesAdminRoleId = isRoleObject(role) && ADMIN_ROLE_ID ? role.id === ADMIN_ROLE_ID : false;
+      const matchesAnyAdminRole = isRoleObject(role) ? ADMIN_ROLE_IDS.includes(role.id || '') : false;
       
       // Debug logging
       console.log('Auth check:', {
         roleId: isRoleObject(role) ? role.id : 'no role',
         adminAccess: isRoleObject(role) ? role.admin_access : 'no role',
         adminRoleId: ADMIN_ROLE_ID,
+        adminRoleIds: ADMIN_ROLE_IDS,
         hasAdminFlag,
-        matchesAdminRoleId
+        matchesAdminRoleId,
+        matchesAnyAdminRole
       });
       
-      const isAdmin = hasAdminFlag || matchesAdminRoleId;
+      const isAdmin = hasAdminFlag || matchesAdminRoleId || matchesAnyAdminRole;
       
       dispatch({
         type: 'CHECK_AUTH_SUCCESS',
@@ -141,17 +144,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const role = me?.role;
       const hasAdminFlag = isRoleObject(role) ? Boolean(role.admin_access) : false;
       const matchesAdminRoleId = isRoleObject(role) && ADMIN_ROLE_ID ? role.id === ADMIN_ROLE_ID : false;
+      const matchesAnyAdminRole = isRoleObject(role) ? ADMIN_ROLE_IDS.includes(role.id || '') : false;
       
       // Debug logging
       console.log('Login auth check:', {
         roleId: isRoleObject(role) ? role.id : 'no role',
         adminAccess: isRoleObject(role) ? role.admin_access : 'no role',
         adminRoleId: ADMIN_ROLE_ID,
+        adminRoleIds: ADMIN_ROLE_IDS,
         hasAdminFlag,
-        matchesAdminRoleId
+        matchesAdminRoleId,
+        matchesAnyAdminRole
       });
       
-      const isAdmin = hasAdminFlag || matchesAdminRoleId;
+      const isAdmin = hasAdminFlag || matchesAdminRoleId || matchesAnyAdminRole;
       
       dispatch({
         type: 'LOGIN_SUCCESS',
