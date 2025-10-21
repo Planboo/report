@@ -2,13 +2,26 @@ import { http, HttpResponse } from 'msw';
 import { DIRECTUS_URL } from '../../lib/env';
 
 let isAdmin = true;
+let currentUser = 'admin@example.com';
 
 export const handlers = [
   // Health
   http.get(`${DIRECTUS_URL}/server/ping`, () => HttpResponse.json({ status: 'ok' })),
 
   // Auth login (mock)
-  http.post(`${DIRECTUS_URL}/auth/login`, async () => {
+  http.post(`${DIRECTUS_URL}/auth/login`, async ({ request }) => {
+    const body = await request.json() as { email: string; password: string };
+    
+    // Handle specific test user
+    if (body.email === 'j@g.com' && body.password === '123456') {
+      currentUser = 'j@g.com';
+      isAdmin = true; // project_manager has admin access
+      return HttpResponse.json({ data: { access_token: 'mock', refresh_token: 'mock' } });
+    }
+    
+    // Default admin user
+    currentUser = 'admin@example.com';
+    isAdmin = true;
     return HttpResponse.json({ data: { access_token: 'mock', refresh_token: 'mock' } });
   }),
 
@@ -17,12 +30,27 @@ export const handlers = [
     const url = new URL(request.url);
     const fields = url.searchParams.get('fields');
     
+    // Handle project_manager user
+    if (currentUser === 'j@g.com') {
+      return HttpResponse.json({
+        data: {
+          id: 'user_project_manager',
+          email: 'j@g.com',
+          role: { 
+            id: '31111be2-81e5-48a3-8746-2d53718248c6', 
+            name: 'Project Manager', 
+            admin_access: true 
+          }
+        }
+      });
+    }
+    
     // Check if this is the auth check request (with role fields)
     if (fields && fields.includes('role')) {
       return HttpResponse.json({
         data: {
           id: 'user_1',
-          email: 'admin@example.com',
+          email: currentUser,
           role: { 
             id: isAdmin ? '69db487d-4b8c-433a-8f2b-ef25923d8615' : 'regular-user-role', 
             name: isAdmin ? 'Admin' : 'User', 
@@ -36,7 +64,7 @@ export const handlers = [
     return HttpResponse.json({
       data: {
         id: 'user_1',
-        email: 'admin@example.com',
+        email: currentUser,
         role: { 
           id: isAdmin ? '69db487d-4b8c-433a-8f2b-ef25923d8615' : 'regular-user-role', 
           name: isAdmin ? 'Admin' : 'User', 
@@ -49,4 +77,8 @@ export const handlers = [
 
 export function __setIsAdmin(value: boolean) {
   isAdmin = value;
+}
+
+export function __setCurrentUser(email: string) {
+  currentUser = email;
 }
