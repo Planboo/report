@@ -1,19 +1,21 @@
-import { useAuth } from '../contexts/AuthContext';
-import Gallery from '../features/photos/Gallery';
-import { Navigate } from 'react-router-dom';
-import Navigation from '../components/Navigation';
+import { useAuth } from "../hooks/useAuth";
+import Gallery from "../features/photos/Gallery";
+import { Navigate } from "react-router-dom";
+import Navigation from "../components/Navigation";
 
 export default function PhotosPage() {
   const { state } = useAuth();
 
-  if (state.loading) return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      <div className="p-6">Loading...</div>
-    </div>
-  );
-  
-  if (!state.isAuthenticated || !state.isAdmin) return <Navigate to="/" replace />;
+  if (state.loading)
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="p-6">Loading...</div>
+      </div>
+    );
+
+  if (!state.isAuthenticated || !state.isAdmin)
+    return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-gray-50">

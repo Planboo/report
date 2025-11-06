@@ -1,10 +1,10 @@
-import '@testing-library/jest-dom/vitest';
-import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server } from '../msw/server';
-import { cleanup } from '@testing-library/react';
+import "@testing-library/jest-dom/vitest";
+import { afterAll, afterEach, beforeAll } from "vitest";
+import { server } from "../msw/server";
+import { cleanup } from "@testing-library/react";
 
 // Establish API mocking before all tests.
-beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
+beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 
 // Reset handlers and cleanup DOM between tests
 afterEach(() => {
@@ -14,4 +14,3 @@ afterEach(() => {
 
 // Close the server when tests finish
 afterAll(() => server.close());
-

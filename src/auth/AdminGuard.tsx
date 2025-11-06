@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
-import { fetchCurrentUser, isAuthenticated } from '../lib/directus';
-import { ADMIN_ROLE_ID } from '../lib/env';
+import { useEffect, useState } from "react";
+import { fetchPoliciesGlobals, isAuthenticated } from "../lib/directus";
 
 type AdminGuardProps = {
   fallback?: React.ReactNode;
   children: React.ReactNode;
 };
 
-function isRoleObject(role: unknown): role is { id?: string; admin_access?: boolean } {
-  return typeof role === 'object' && role !== null;
-}
-
 export function AdminGuard({ fallback = null, children }: AdminGuardProps) {
-  const [status, setStatus] = useState<'loading' | 'unauthorized' | 'authorized'>('loading');
+  const [status, setStatus] = useState<
+    "loading" | "unauthorized" | "authorized"
+  >("loading");
 
   useEffect(() => {
     let mounted = true;
@@ -20,19 +17,19 @@ export function AdminGuard({ fallback = null, children }: AdminGuardProps) {
       try {
         if (!isAuthenticated()) {
           if (!mounted) return;
-          setStatus('unauthorized');
+          setStatus("unauthorized");
           return;
         }
-        const me = await fetchCurrentUser();
-        const role = me?.role;
-        const hasAdminFlag = isRoleObject(role) ? Boolean(role.admin_access) : false;
-        const matchesAdminRoleId = isRoleObject(role) && ADMIN_ROLE_ID ? role.id === ADMIN_ROLE_ID : false;
-        const isAdmin = hasAdminFlag || matchesAdminRoleId;
+        
+        // Fetch policies to check admin access (primary method)
+        const policies = await fetchPoliciesGlobals();
+        const isAdmin = Boolean(policies.admin_access);
+        
         if (!mounted) return;
-        setStatus(isAdmin ? 'authorized' : 'unauthorized');
+        setStatus(isAdmin ? "authorized" : "unauthorized");
       } catch {
         if (!mounted) return;
-        setStatus('unauthorized');
+        setStatus("unauthorized");
       }
     })();
     return () => {
@@ -40,8 +37,8 @@ export function AdminGuard({ fallback = null, children }: AdminGuardProps) {
     };
   }, []);
 
-  if (status === 'loading') return null;
-  if (status === 'unauthorized') return <>{fallback}</>;
+  if (status === "loading") return null;
+  if (status === "unauthorized") return <>{fallback}</>;
   return <>{children}</>;
 }
 

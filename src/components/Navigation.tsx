@@ -1,5 +1,5 @@
-import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { useAuth } from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export default function Navigation() {
   const { state, logout } = useAuth();
@@ -13,7 +13,7 @@ export default function Navigation() {
               Photo Review
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             {state.isAuthenticated ? (
               <>

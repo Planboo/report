@@ -1,4 +1,4 @@
-import { login as directusLogin, logout as directusLogout } from './directus';
+import { login as directusLogin, logout as directusLogout } from "./directus";
 
 export async function signInWithPassword(email: string, password: string) {
   await directusLogin(email, password);

@@ -1,14 +1,9 @@
-import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement } from 'react';
-import { MemoryRouter } from 'react-router-dom';
-
-function Providers({ children }: { children: React.ReactNode }) {
-  return <MemoryRouter>{children}</MemoryRouter>;
-}
+import { render, type RenderOptions, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { TestProviders } from "./TestProviders";
 
 export function renderWithProviders(ui: ReactElement, options?: RenderOptions) {
-  return render(ui, { wrapper: Providers, ...options });
+  return render(ui, { wrapper: TestProviders, ...options });
 }
 
-export * from '@testing-library/react';
-
+export { screen };
